@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Storybook</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            background-color: #f3f0e8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #5a3e2b;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 10px 10px 5px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        label {
+            margin-bottom: -5px;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            max-width: 200px;
+            padding: 8px 12px;
+            font-size: 1.1em;
+            color: #fff;
+            background-color: #5a3e2b;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #704c36;
+        }
+
+        .genre-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .genre-button {
+            background-color: #8e5e4a;
+            color: white;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .genre-button:hover {
+            background-color: #704c36;
+        }
+
+        .genre-button.selected {
+            background-color: #5a3e2b;
+            opacity: 0.7;
+        }
+
+        .storybook {
+            width: 80%;
+            max-width: 900px;
+            margin: 20px auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #5a3e2b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            display: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #704c36;
+        }
+
+        .book {
+            display: flex;
+            flex-wrap: nowrap;
+            width: 100%;
+            height: 500px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .page-pair {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page {
+            flex: 1;
+            height: 100%;
+            background: #f9f8f3;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: left;
+            overflow-y: auto;
+        }
+
+        .page img {
+            max-width: 90%;
+            max-height: 50%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #5a3e2b;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button:hover {
+            background-color: #704c36;
+        }
+
+        .prev {
+            left: -60px;
+        }
+
+        .next {
+            right: -60px;
+        }
+
+        .spinner {
+            display: none;
+            margin: 20px auto;
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #5a3e2b;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<h1>AI Storybook Generator</h1>
+<button class="download-btn" id="downloadBtn" onclick="downloadPDF()">Download PDF</button>
+<form id="story-form">
+    <label for="story-idea">Enter the story prompt:</label><br>
+    <textarea id="story-idea" name="story_idea" rows="4" cols="50"></textarea><br>
+
+    <div class="genre-buttons">
+        <button type="button" class="genre-button" id="comedy-btn" onclick="selectGenre('comedy')">Comedy</button>
+        <button type="button" class="genre-button" id="fantasy-btn" onclick="selectGenre('fantasy')">Fantasy</button>
+        <button type="button" class="genre-button" id="adventure-btn" onclick="selectGenre('adventure')">Adventure</button>
+        <button type="button" class="genre-button" id="mystery-btn" onclick="selectGenre('mystery')">Mystery</button>
+        <button type="button" class="genre-button" id="scifi-btn" onclick="selectGenre('scifi')">Science Fiction</button>
+    </div>
+
+    <button type="button" onclick="generateStory()">Generate Story</button>
+</form>
+
+<div class="spinner" id="spinner"></div>
+
+<div class="storybook">
+    <button class="nav-button prev" id="prevPage" onclick="prevPage()">&#8249;</button>
+    <div class="book" id="book"></div>
+    <button class="nav-button next" id="nextPage" onclick="nextPage()">&#8250;</button>
+</div>
+
+<script>
+    let currentPage = 0;
+    let pages = [];
+    let selectedGenre = " ";
+
+    function selectGenre(genre) {
+        if (selectedGenre.trim()) {
+            const previousButton = document.getElementById(`${selectedGenre.trim()}-btn`);
+            previousButton.classList.remove('selected');
+        }
+
+        const button = document.getElementById(`${genre}-btn`);
+        button.classList.add('selected');
+        selectedGenre = genre;
+    }
+
+    async function generateStory() {
+        const storyIdea = document.getElementById("story-idea").value;
+        const spinner = document.getElementById("spinner");
+        const book = document.getElementById("book");
+        const downloadBtn = document.getElementById("downloadBtn");
+
+        spinner.style.display = "block";
+        book.innerHTML = "";
+        pages = [];
+        currentPage = 0;
+        updateNavigationButtons();
+        downloadBtn.style.display = "none";
+
+        try {
+            const response = await fetch(`/generate?story_idea=${encodeURIComponent(storyIdea)}&genre=${encodeURIComponent(selectedGenre)}`);
+            const storyPages = await response.json();
+
+            const pagePairs = [];
+            for (let i = 0; i < storyPages.length; i += 2) {
+                const pair = document.createElement("div");
+                pair.className = `page-pair ${i === 0 ? "" : "hidden"}`;
+
+                const page1 = createPage(storyPages[i]?.text || "", storyPages[i]?.image || null);
+                const page2 = createPage(storyPages[i + 1]?.text || "", storyPages[i + 1]?.image || null);
+
+                pair.appendChild(page1);
+                pair.appendChild(page2);
+
+                pagePairs.push(pair);
+                book.appendChild(pair);
+            }
+
+            pages = pagePairs;
+            downloadBtn.style.display = "block";
+        } catch (error) {
+            alert("Error generating story. Please try again.");
+        } finally {
+            spinner.style.display = "none";
+            updateNavigationButtons();
+        }
+    }
+
+    function createPage(text, image) {
+        const pageDiv = document.createElement("div");
+        pageDiv.className = "page";
+        pageDiv.innerHTML = `<p>${text}</p>`;
+        if (image) {
+            const img = document.createElement("img");
+            img.src = image;
+            img.alt = "Story Image";
+            pageDiv.appendChild(img);
+        }
+        return pageDiv;
+    }
+
+    function updateNavigationButtons() {
+        document.getElementById("prevPage").style.display = currentPage === 0 ? "none" : "flex";
+        document.getElementById("nextPage").style.display = currentPage === pages.length - 1 ? "none" : "flex";
+    }
+
+    function prevPage() {
+        if (currentPage > 0) {
+            pages[currentPage].classList.add("hidden");
+            currentPage -= 1;
+            pages[currentPage].classList.remove("hidden");
+            updateNavigationButtons();
+        }
+    }
+
+    function nextPage() {
+        if (currentPage < pages.length - 1) {
+            pages[currentPage].classList.add("hidden");
+            currentPage += 1;
+            pages[currentPage].classList.remove("hidden");
+            updateNavigationButtons();
+        }
+    }
+
+async function downloadPDF() {
+    const storyPages = [];
+    for (const pagePair of pages) {
+        const pageElements = pagePair.querySelectorAll('.page');
+        pageElements.forEach(pageElement => {
+            const textElement = pageElement.querySelector('p');
+            const imageElement = pageElement.querySelector('img');
+
+            storyPages.push({
+                text: textElement ? textElement.textContent : "",
+                image: imageElement ? imageElement.src : null
+            });
+        });
+    }
+
+    try {
+        const response = await fetch("/download-pdf", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ pages: storyPages })
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "storybook.pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } else {
+            throw new Error('Failed to download PDF');
+        }
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        alert("Failed to download the PDF. Please try again.");
+    }
+}
+</script>
+</body>
+</html>
