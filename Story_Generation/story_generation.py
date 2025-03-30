@@ -16,8 +16,10 @@ headers = {"Authorization": HF_API_KEY}
 def fetch_text_response(payload):
     for api_url in [TEXT_API_URL, TEXT_API_BACKUP_URL]:
         while True:
+            print("making story text" + api_url);
             response = requests.post(api_url, headers=headers, json=payload)
             result = response.json()
+            print("result: " + result);
 
             if "error" in result:
                 if "loading" in result["error"]:
@@ -61,6 +63,7 @@ def generate_text(prompt, max_pages=20, tokens_per_page=100):
     else:
         os.makedirs(images_directory)
 
+    print("now preparing payload");
     for page_num in range(max_pages):
         payload = {
             "inputs": story,
@@ -70,6 +73,7 @@ def generate_text(prompt, max_pages=20, tokens_per_page=100):
                 "temperature": 0.7
             }
         }
+        print ("now calling fetch text response");
 
         page_text = fetch_text_response(payload)
         print(page_text);

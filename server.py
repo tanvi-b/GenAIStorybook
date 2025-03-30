@@ -21,6 +21,7 @@ def generate_story():
     if not story_genre:
         return jsonify({"error": "No story genre given"}), 400
 
+    print("story prompt: " + story_prompt);
     story_pages = generate_text(
         story_prompt + " Write a short " + story_genre + " story. It should have a beginning, middle, and end. Conclude the story within "
                        "1000 words. It should be minimum 750 words and maximum 1000 words. Start printing story "
