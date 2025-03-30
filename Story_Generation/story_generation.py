@@ -72,6 +72,7 @@ def generate_text(prompt, max_pages=20, tokens_per_page=100):
         }
 
         page_text = fetch_text_response(payload)
+        print(page_text);
 
         if not page_text:
             print("Story finished or error occurred.")
