@@ -18,7 +18,9 @@ def fetch_text_response(payload):
         while True:
             print("making story text" + api_url);
             response = requests.post(api_url, headers=headers, json=payload)
+            print("after requests post");
             result = response.json()
+            print ("result generated");
 
             if "error" in result:
                 if "loading" in result["error"]:
@@ -29,6 +31,7 @@ def fetch_text_response(payload):
                     print(f"Error: {result['error']}")
                     break
 
+            print(result[0].get("generated_text", "").strip());
             return result[0].get("generated_text", "").strip()
     return None
 
