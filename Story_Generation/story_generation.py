@@ -19,7 +19,6 @@ def fetch_text_response(payload):
             print("making story text" + api_url);
             response = requests.post(api_url, headers=headers, json=payload)
             result = response.json()
-            print("result: " + result);
 
             if "error" in result:
                 if "loading" in result["error"]:
