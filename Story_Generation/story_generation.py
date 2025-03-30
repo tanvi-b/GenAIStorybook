@@ -50,7 +50,7 @@ def generate_image_for_page(page_text, page_num):
         print(f"Couldn't create image for page {page_num + 1}. HTTP code: {image_response.status_code}")
     return image_path;
 
-def generate_text(prompt, max_pages=20, tokens_per_page=100):
+def generate_text(prompt, max_pages=1, tokens_per_page=100):
     story = prompt.strip()
     story_pages = []
 
